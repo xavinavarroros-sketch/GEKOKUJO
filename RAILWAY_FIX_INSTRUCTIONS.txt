@@ -1,0 +1,19 @@
+Railway fix applied:
+- Build error is NOT caused by Supabase setup.
+- The previous error was Docker/npm failing to find Next.js during build.
+- This Dockerfile uses Node 20 and runs Next directly from node_modules/next/dist/bin/next.
+- Email confirmation is bypassed by server registration, requiring SUPABASE_SERVICE_ROLE_KEY.
+
+Required Railway variables:
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_APP_URL=https://your-app.up.railway.app
+GAME_MASTER_EMAIL=xavinavarroros@gmail.com
+NEXT_PUBLIC_GAME_MASTER_EMAIL=xavinavarroros@gmail.com
+
+After upload:
+1. Push all files to GitHub.
+2. In Railway, deploy from GitHub.
+3. If it keeps failing with an old Dockerfile, clear Railway build cache or redeploy latest commit.
+4. Make sure Railway is using Dockerfile builder.
