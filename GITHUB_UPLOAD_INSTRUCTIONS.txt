@@ -1,0 +1,20 @@
+SENGOKU JIDAI - GITHUB / RAILWAY UPLOAD
+
+This ZIP is packed with the project files at the root level.
+
+GitHub upload:
+1. Extract this ZIP.
+2. Open the extracted folder.
+3. Select all files and folders inside it.
+4. Drag them into your empty GitHub repository.
+5. Commit the upload.
+
+Important: do not upload node_modules, .next, or .env.local.
+
+Railway variables required:
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+NEXT_PUBLIC_APP_URL=https://your-app.up.railway.app
+
+Railway should detect the app automatically. Build uses npm ci and start uses next start -H 0.0.0.0.
