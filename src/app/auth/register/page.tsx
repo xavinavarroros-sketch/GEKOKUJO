@@ -18,15 +18,25 @@ export default function RegisterPage() {
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { character_name: characterName || 'Wandering Ronin' } },
+
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, characterName }),
     });
+    const result = await res.json();
+
+    if (!res.ok || !result.ok) {
+      setLoading(false);
+      return toast.error(result.error || 'Registration failed.');
+    }
+
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) return toast.error(error.message);
-    toast.success('Your name is written. Now choose your allegiance.');
-    router.push('/auth/choose-clan');
+
+    toast.success(result.isGm ? 'Game Master account created.' : 'Your name is written. Now choose your allegiance.');
+    router.push(result.isGm ? '/gm' : '/auth/choose-clan');
     router.refresh();
   }
 
