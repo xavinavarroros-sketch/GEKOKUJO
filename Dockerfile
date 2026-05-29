@@ -1,28 +1,36 @@
-# Railway hard-fix Dockerfile for Sengoku Jidai
-# Uses Node 20 and installs all dependencies in one stage so Next.js cannot disappear between stages.
-FROM node:20-bookworm-slim
+# Railway stable Dockerfile for Sengoku Jidai
+# Uses Node 20 + npm 11 to avoid Railway/npm install bugs and ensures dev deps exist for Next build.
+FROM node:20.19.0-bookworm-slim AS builder
 
 WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV HOSTNAME=0.0.0.0
+ENV NODE_ENV=development
+ENV NPM_CONFIG_AUDIT=false
+ENV NPM_CONFIG_FUND=false
 
-# Install dependencies first for better Docker caching.
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
 
-# Use npm install instead of npm ci to avoid Railway/cache/lockfile edge cases.
-# Keep dev dependencies during build because Next/TypeScript tooling may need them.
-RUN npm install --include=dev --legacy-peer-deps --no-audit --no-fund \
-  && test -f ./node_modules/next/dist/bin/next \
-  && node ./node_modules/next/dist/bin/next --version
+# Upgrade npm to a stable current version for Node 20, then install from lockfile.
+RUN npm install -g npm@11.6.0 \
+  && npm --version \
+  && npm ci --include=dev --legacy-peer-deps --no-audit --no-fund \
+  && node -e "require.resolve('next/package.json'); console.log('Next installed:', require('next/package.json').version)"
 
 COPY . .
 
-# Build directly through the local Next binary instead of relying on shell PATH.
 RUN node ./node_modules/next/dist/bin/next build
 
+FROM node:20.19.0-bookworm-slim AS runner
+
+WORKDIR /app
+
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV HOSTNAME=0.0.0.0
+
+COPY --from=builder /app ./
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npm run start"]
+CMD ["sh", "-c", "node ./node_modules/next/dist/bin/next start -H 0.0.0.0 -p ${PORT:-3000}"]

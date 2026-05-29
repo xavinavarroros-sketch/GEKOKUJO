@@ -117,7 +117,11 @@ npm run dev
 
 ### Create the first Game Master
 
-Register a normal account through the app (`/auth/register`). Then, in the Supabase SQL Editor, promote that account:
+You can become Game Master in either of two ways (see also the Railway section below):
+
+**By email:** set `GAME_MASTER_EMAIL` and `NEXT_PUBLIC_GAME_MASTER_EMAIL` in `.env.local` to the same address, then register with that email — the account is promoted automatically.
+
+**By SQL:** register a normal account through the app (`/auth/register`), then in the Supabase SQL Editor run:
 
 ```sql
 update profiles
@@ -131,24 +135,37 @@ Reload the app — the **Game Master** section now appears in the sidebar, givin
 
 ## 3. Railway deployment
 
+This project deploys on Railway using the included **`Dockerfile`** (Railway reads `railway.json` and builds from it automatically — no build/start commands to configure by hand).
+
 1. Push this repository to GitHub.
-2. In [Railway](https://railway.app), create a **New Project → Deploy from GitHub repo** and pick the repo.
+2. In [Railway](https://railway.app), create a **New Project → Deploy from GitHub repo** and pick the repo. Railway detects `railway.json` and builds with the Dockerfile.
 3. Add the environment variables under the service's **Variables** tab:
    ```
    NEXT_PUBLIC_SUPABASE_URL=
    NEXT_PUBLIC_SUPABASE_ANON_KEY=
    SUPABASE_SERVICE_ROLE_KEY=
    NEXT_PUBLIC_APP_URL=https://your-app.up.railway.app
+   # Optional — auto-promote one account to Game Master (see below):
+   GAME_MASTER_EMAIL=you@example.com
+   NEXT_PUBLIC_GAME_MASTER_EMAIL=you@example.com
    ```
    Set `NEXT_PUBLIC_APP_URL` to your Railway public domain once it is generated.
-4. Build and start commands are already declared in `railway.json`:
-   - **Build:** `npm ci && NEXT_TELEMETRY_DISABLED=1 npm run build`
-   - **Start:** `npm start`
-   
-   `npm start` runs `next start -H 0.0.0.0` and automatically uses the `PORT` Railway provides.
-5. Deploy, then watch the **Deploy Logs**. When it's live, open the public URL and log in.
+4. Deploy, then watch the **Deploy Logs**. The Docker build runs `npm ci` (Node 20 + npm 11) and `next build`; the container starts with `next start -H 0.0.0.0 -p $PORT`. When it's live, open the public URL and log in.
 
-> **Note on fonts:** the app loads Cinzel and Cormorant Garamond from Google Fonts via a stylesheet `<link>` at runtime, so the build never depends on fetching fonts and won't fail in restricted CI/build networks.
+> If Railway ever shows a stale build, use **Redeploy** and clear the build cache.
+
+> **Note on fonts:** the app loads Cinzel and Cormorant Garamond from Google Fonts via a stylesheet `<link>` at runtime, so the build never depends on fetching fonts and won't fail in restricted build networks.
+
+### Becoming Game Master (two ways)
+
+**Option A — by email (recommended for Railway).** Set `GAME_MASTER_EMAIL` and `NEXT_PUBLIC_GAME_MASTER_EMAIL` to the same email, then register/log in with that email. The app promotes that account to Game Master automatically. Open `/gm` after login.
+
+**Option B — by SQL.** Register normally, then in the Supabase SQL Editor run:
+```sql
+update profiles set is_gm = true, role = 'gm' where email = 'you@example.com';
+```
+
+Either way, the **Game Master** section appears in the sidebar, giving full control: edit clans/provinces, assign players, advance the season, resolve battles and sieges, force espionage outcomes, appoint the Shogun, post announcements, and add media/lore.
 
 ---
 
@@ -192,12 +209,3 @@ After deploying, confirm:
 ## License
 
 Provided as a functional, extensible base for your own campaign. Adapt freely.
-
-
-Game Master access:
-Set these Railway variables, then register/login with that same email. The app will automatically show the Game Master panel.
-
-GAME_MASTER_EMAIL=xavinavarroros@gmail.com
-NEXT_PUBLIC_GAME_MASTER_EMAIL=xavinavarroros@gmail.com
-
-Open /gm after login.
