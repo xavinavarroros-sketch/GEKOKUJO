@@ -24,6 +24,19 @@ export default function ChooseClanPage() {
 
   useEffect(() => {
     (async () => {
+      // If this account is the configured Game Master, promote it and skip clan selection.
+      try {
+        const gmRes = await fetch('/api/gm/bootstrap', { method: 'POST' });
+        const gmJson = await gmRes.json();
+        if (gmJson?.isGm) {
+          router.push('/gm');
+          router.refresh();
+          return;
+        }
+      } catch {
+        // Continue normal clan selection if bootstrap is unavailable.
+      }
+
       const { data: clansData } = await supabase
         .from('clans').select('id,name,description,color').order('name');
       const { data: positions } = await supabase

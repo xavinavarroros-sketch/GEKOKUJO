@@ -18,3 +18,12 @@ SUPABASE_SERVICE_ROLE_KEY=
 NEXT_PUBLIC_APP_URL=https://your-app.up.railway.app
 
 Railway should detect the app automatically. Build uses npm ci and start uses next start -H 0.0.0.0.
+
+
+Game Master access:
+Set these Railway variables, then register/login with that same email. The app will automatically show the Game Master panel.
+
+GAME_MASTER_EMAIL=xavinavarroros@gmail.com
+NEXT_PUBLIC_GAME_MASTER_EMAIL=xavinavarroros@gmail.com
+
+Open /gm after login.

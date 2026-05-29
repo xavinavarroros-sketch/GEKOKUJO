@@ -192,3 +192,12 @@ After deploying, confirm:
 ## License
 
 Provided as a functional, extensible base for your own campaign. Adapt freely.
+
+
+Game Master access:
+Set these Railway variables, then register/login with that same email. The app will automatically show the Game Master panel.
+
+GAME_MASTER_EMAIL=xavinavarroros@gmail.com
+NEXT_PUBLIC_GAME_MASTER_EMAIL=xavinavarroros@gmail.com
+
+Open /gm after login.
