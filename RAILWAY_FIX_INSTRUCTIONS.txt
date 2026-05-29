@@ -1,0 +1,22 @@
+RAILWAY FIX APPLIED
+
+The Railway error happened because Railway was building with Node 18, while Supabase packages require Node 20+.
+
+This ZIP adds:
+- Dockerfile using node:20-alpine
+- railway.json forced to DOCKERFILE builder
+- package.json engines: node 20, npm 10
+- start command using Railway PORT variable
+- .dockerignore to avoid uploading build/cache/env files
+
+Railway steps:
+1. Upload/commit all files to GitHub, including Dockerfile, railway.json, package.json and package-lock.json.
+2. In Railway, redeploy from GitHub.
+3. If Railway still uses NIXPACKS, delete the failed Railway service and create a new service from the same GitHub repo, or set service variable RAILWAY_DOCKERFILE_PATH=Dockerfile.
+4. Make sure these variables exist in Railway:
+   NEXT_PUBLIC_SUPABASE_URL
+   NEXT_PUBLIC_SUPABASE_ANON_KEY
+   SUPABASE_SERVICE_ROLE_KEY
+   NEXT_PUBLIC_APP_URL=https://your-app.up.railway.app
+
+Do not upload node_modules, .next or .env files.
